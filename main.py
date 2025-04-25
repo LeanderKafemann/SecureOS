@@ -4,6 +4,8 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from tkinter import PhotoImage, Tk, Canvas, Button
 import pygame.camera
+from image_similarity_measures.evaluate import evaluation
+
 
 active = True
 locked = False
@@ -42,11 +44,12 @@ def takePhoto():
 def abgleich():
     akt = PhotoImage(file="./aktPhoto.png")
     last = PhotoImage(file="./lastPhoto.png")
-    dif = countDif(getallpixels(akt), getallpixels(last))
+    dif = evaluation(org_img_path="./aktPhoto.png", pred_img_path="./lastPhoto.png", metrics=["ssim", "fsim", "rmse", "psnr", "issm", "sre", "sam"])
+    #countDif(getallpixels(akt), getallpixels(last))
     print(dif)
-    if dif > 358000:
-        sendPhoto("./lastPhoto.png")
-        sendPhoto("./aktPhoto.png")
+    #if dif > 358000:
+    #    sendPhoto("./lastPhoto.png")
+    #    sendPhoto("./aktPhoto.png")
     os.remove("./lastPhoto.png")
     shutil.move("./aktPhoto.png", "./lastPhoto.png")
 
@@ -93,7 +96,7 @@ def main():
         else:
             buttons = ["Oberfläche sperren", "Foto senden", "Prüfen", "Initialisieren", "Beenden"]
             buttons += ["Deaktivieren"] if active else ["Aktivieren"]
-        match pyautogui.confirm("Welche Aktion wollen Sie ausführen?", "Menü V1.0.0-BETA", buttons=buttons):
+        match pyautogui.confirm("Welche Aktion wollen Sie ausführen?", "Menü V0.3.2-BETA", buttons=buttons):
             case "Oberfläche sperren":
                 pin = pyautogui.password("PIN erstellen:", "PIN")
                 locked = True
@@ -122,6 +125,6 @@ c.pack()
 
 c.create_text(200, 50, text="SecureOS Pro", font=("Verdana", "30", "bold"), anchor="center")
 c.create_window(200, 120, anchor="center", window=Button(master=fenster, text="Beenden", relief="ridge", command=quit, background="light blue"))
-c.create_text(200, 180, text="Version 0.3.1--BETA - Copyright LK 2025", font=("Verdana", "7"), anchor="center")
+c.create_text(200, 180, text="Version 0.3.2--BETA - Copyright LK 2025", font=("Verdana", "7"), anchor="center")
 
 fenster.mainloop()
