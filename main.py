@@ -5,7 +5,10 @@ from email.mime.multipart import MIMEMultipart
 from tkinter import PhotoImage, Tk, Canvas, Button
 import pygame.camera
 from image_similarity_measures.evaluate import evaluation
-
+from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.models import Model
+from scipy.spatial.distance import cosine
 
 active = True
 locked = False
