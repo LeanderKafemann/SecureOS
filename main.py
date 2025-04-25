@@ -14,6 +14,8 @@ fenster = None
 
 with open("./login_credentials.txt", "r", encoding="utf-8") as f:
     NAME, PWD = f.read().split("#*#")
+with open("./send_to.txt", "r", encoding="utf-8") as f:
+    SEND_TO = f.read()
 
 def countDif(list1: list, list2: list):
     dif = 0
@@ -45,10 +47,11 @@ def abgleich():
     last = PhotoImage(file="./lastPhoto.png")
     dif = countDif(getallpixels(akt), getallpixels(last))
     eval_ = evaluation(org_img_path="./aktPhoto.png", pred_img_path="./lastPhoto.png", metrics=["ssim", "fsim", "rmse", "psnr", "issm", "sre", "sam"])
-    print(dif)
-    if dif > 360000 or eval_["ssim"] < 0.8 or eval_["psmr"] > 40 or eval_["sam"] == 0:
+    log_ = "(similaritys: {})".format(str(dif)+"|"+str(eval_))
+    print(log_)
+    if dif > 360000 or eval_["ssim"] < 0.8 or eval_["sam"] == 0:#or eval_["psnr"] > 40
         sendPhoto("./lastPhoto.png", "lastPhoto")
-        sendPhoto("./aktPhoto.png", "aktPhoto (similaritys: {})".format(str(dif)+"|"+str(eval_)))
+        sendPhoto("./aktPhoto.png", "aktPhoto"+log_)
     os.remove("./lastPhoto.png")
     shutil.move("./aktPhoto.png", "./lastPhoto.png")
 
@@ -61,13 +64,13 @@ def sendPhoto(path: str, message: str = "Sicherheitsfoto"):
     nachricht = MIMEMultipart()
     nachricht["From"] = "Security-Bot <update-bot@lk.kafemann.berlin>"
     nachricht["Subject"] = "Sicherheitsfoto"
-    nachricht["To"] = "Owner <leander@kafemann.berlin>"
+    nachricht["To"] = "Owner <{}>".format(SEND_TO)
     text_content = message
     text = MIMEText(text_content)
     nachricht.attach(text)
     image = MIMEImage(img_data, name=os.path.basename(path))
     nachricht.attach(image)
-    s.sendmail("Security-Bot <update-bot@lk.kafemann.berlin>", "Owner <leander@kafemann.berlin>", nachricht.as_string())
+    s.sendmail("Security-Bot <update-bot@lk.kafemann.berlin>", "Owner <{}>".format(SEND_TO), nachricht.as_string())
     s.quit()
 
 def abgleichAgent():
@@ -88,14 +91,14 @@ fenster.title("SecureOS")
 threading.Thread(target=abgleichAgent).start()
 
 def main():
-    global locked, pin, active#, fenster
+    global locked, pin, active, end
     while True:
         if locked:
             buttons = ["Oberfläche entsperren"]
         else:
             buttons = ["Oberfläche sperren", "Foto senden", "Prüfen", "Initialisieren", "Beenden"]
             buttons += ["Deaktivieren"] if active else ["Aktivieren"]
-        match pyautogui.confirm("Welche Aktion wollen Sie ausführen?", "Menü V0.4.0-BETA", buttons=buttons):
+        match pyautogui.confirm("Welche Aktion wollen Sie ausführen?", "Menü V0.5.0-BETA", buttons=buttons):
             case "Oberfläche sperren":
                 pin = pyautogui.password("PIN erstellen:", "PIN")
                 locked = True
@@ -112,8 +115,13 @@ def main():
                 shutil.move("./aktPhoto.png", "./lastPhoto.png")
             case "Foto senden":
                 sendPhoto("./lastPhoto.png")
+            case "Deaktivieren":
+                active = False
+            case "Aktivieren":
+                active = True
             case "Beenden" | _:
                 pyautogui.alert("Dies kann bis zu 45 Sekunden dauern.", "Beenden")
+                end = True
                 fenster.destroy()
                 quit()
 threading.Thread(target=main).start()
@@ -125,6 +133,6 @@ c.pack()
 c.create_text(200, 50, text="SecureOS Pro", font=("Verdana", "30", "bold"), anchor="center")
 c.create_text(200, 150, text="More window functions coming soon...", font=("Verdana", "12"), anchor="center")
 c.create_window(200, 120, anchor="center", window=Button(master=fenster, text="Beenden", relief="ridge", command=quit, background="light blue"))
-c.create_text(200, 180, text="Version 0.4.0--BETA - Copyright Leander Kafemann 2025", font=("Verdana", "7"), anchor="center")
+c.create_text(200, 180, text="Version 0.5.0--BETA - Copyright Leander Kafemann 2025", font=("Verdana", "7"), anchor="center")
 
 fenster.mainloop()
