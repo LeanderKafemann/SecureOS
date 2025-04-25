@@ -124,6 +124,6 @@ c.pack()
 c.create_text(200, 50, text="SecureOS Pro", font=("Verdana", "30", "bold"), anchor="center")
 c.create_text(200, 150, text="More window functions coming soon...", font=("Verdana", "12"), anchor="center")
 c.create_window(200, 120, anchor="center", window=Button(master=fenster, text="Beenden", relief="ridge", command=quit, background="light blue"))
-c.create_text(200, 180, text="Version 0.3.3--BETA - Copyright LK 2025", font=("Verdana", "7"), anchor="center")
+c.create_text(200, 180, text="Version 0.3.3--BETA - Copyright Leander Kafemann 2025", font=("Verdana", "7"), anchor="center")
 
 fenster.mainloop()
