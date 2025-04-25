@@ -6,7 +6,6 @@ from tkinter import PhotoImage, Tk, Canvas, Button
 import pygame.camera
 from image_similarity_measures.evaluate import evaluation
 
-
 active = True
 locked = False
 end = False
@@ -44,12 +43,12 @@ def takePhoto():
 def abgleich():
     akt = PhotoImage(file="./aktPhoto.png")
     last = PhotoImage(file="./lastPhoto.png")
-    dif = evaluation(org_img_path="./aktPhoto.png", pred_img_path="./lastPhoto.png", metrics=["ssim", "fsim", "rmse", "psnr", "issm", "sre", "sam"])
-    #countDif(getallpixels(akt), getallpixels(last))
+    dif = countDif(getallpixels(akt), getallpixels(last))
+    eval_ = evaluation(org_img_path="./aktPhoto.png", pred_img_path="./lastPhoto.png", metrics=["ssim", "fsim", "rmse", "psnr", "issm", "sre", "sam"])
     print(dif)
-    #if dif > 358000:
-    #    sendPhoto("./lastPhoto.png")
-    #    sendPhoto("./aktPhoto.png")
+    if dif > 360000:
+        sendPhoto("./lastPhoto.png")
+        sendPhoto("./aktPhoto.png")
     os.remove("./lastPhoto.png")
     shutil.move("./aktPhoto.png", "./lastPhoto.png")
 
@@ -69,7 +68,6 @@ def sendPhoto(path: str):
     nachricht.attach(image)
     s.sendmail("Security-Bot <update-bot@lk.kafemann.berlin>", "Owner <leander@kafemann.berlin>", nachricht.as_string())
     s.quit()
-
 
 def abgleichAgent():
     global active
@@ -96,7 +94,7 @@ def main():
         else:
             buttons = ["Oberfläche sperren", "Foto senden", "Prüfen", "Initialisieren", "Beenden"]
             buttons += ["Deaktivieren"] if active else ["Aktivieren"]
-        match pyautogui.confirm("Welche Aktion wollen Sie ausführen?", "Menü V0.3.2-BETA", buttons=buttons):
+        match pyautogui.confirm("Welche Aktion wollen Sie ausführen?", "Menü V0.3.3-BETA", buttons=buttons):
             case "Oberfläche sperren":
                 pin = pyautogui.password("PIN erstellen:", "PIN")
                 locked = True
@@ -124,7 +122,8 @@ c.configure(bg="light blue")
 c.pack()
 
 c.create_text(200, 50, text="SecureOS Pro", font=("Verdana", "30", "bold"), anchor="center")
+c.create_text(200, 150, text="More window functions coming soon...", font=("Verdana", "12"), anchor="center")
 c.create_window(200, 120, anchor="center", window=Button(master=fenster, text="Beenden", relief="ridge", command=quit, background="light blue"))
-c.create_text(200, 180, text="Version 0.3.2--BETA - Copyright LK 2025", font=("Verdana", "7"), anchor="center")
+c.create_text(200, 180, text="Version 0.3.3--BETA - Copyright LK 2025", font=("Verdana", "7"), anchor="center")
 
 fenster.mainloop()
