@@ -1,3 +1,9 @@
+# Custom
+login_credentials.txt
+lastPhoto.png
+.vs/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
