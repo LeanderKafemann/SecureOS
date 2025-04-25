@@ -46,13 +46,13 @@ def abgleich():
     dif = countDif(getallpixels(akt), getallpixels(last))
     eval_ = evaluation(org_img_path="./aktPhoto.png", pred_img_path="./lastPhoto.png", metrics=["ssim", "fsim", "rmse", "psnr", "issm", "sre", "sam"])
     print(dif)
-    if dif > 360000:
-        sendPhoto("./lastPhoto.png")
-        sendPhoto("./aktPhoto.png")
+    if dif > 360000 or eval_["ssim"] < 0.8 or eval_["psmr"] > 40 or eval_["sam"] == 0:
+        sendPhoto("./lastPhoto.png", "lastPhoto")
+        sendPhoto("./aktPhoto.png", "aktPhoto (similaritys: {})".format(str(dif)+"|"+str(eval_)))
     os.remove("./lastPhoto.png")
     shutil.move("./aktPhoto.png", "./lastPhoto.png")
 
-def sendPhoto(path: str):
+def sendPhoto(path: str, message: str = "Sicherheitsfoto"):
     with open(path, 'rb') as f:
         img_data = f.read()
     s = smtplib.SMTP("smtp.IONOS.de", 587)
@@ -62,7 +62,8 @@ def sendPhoto(path: str):
     nachricht["From"] = "Security-Bot <update-bot@lk.kafemann.berlin>"
     nachricht["Subject"] = "Sicherheitsfoto"
     nachricht["To"] = "Owner <leander@kafemann.berlin>"
-    text = MIMEText("Sicherheitsfoto")
+    text_content = message
+    text = MIMEText(text_content)
     nachricht.attach(text)
     image = MIMEImage(img_data, name=os.path.basename(path))
     nachricht.attach(image)
@@ -84,7 +85,7 @@ def abgleichAgent():
 fenster = Tk()
 fenster.title("SecureOS")
 
-#threading.Thread(target=abgleichAgent).start()
+threading.Thread(target=abgleichAgent).start()
 
 def main():
     global locked, pin, active#, fenster
@@ -113,7 +114,7 @@ def main():
                 sendPhoto("./lastPhoto.png")
             case "Beenden" | _:
                 pyautogui.alert("Dies kann bis zu 45 Sekunden dauern.", "Beenden")
-                #fenster.destroy()
+                fenster.destroy()
                 quit()
 threading.Thread(target=main).start()
 
